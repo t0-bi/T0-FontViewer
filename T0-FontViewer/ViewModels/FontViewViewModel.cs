@@ -37,6 +37,8 @@ namespace T0_FontViewer.ViewModels
 
         private ObservableCollection<char> fontCharacters;
 
+        private ObservableCollection<(FontStyle, FontWeight)> fontFaces;
+
         #endregion
 
         #region ctor
@@ -45,6 +47,7 @@ namespace T0_FontViewer.ViewModels
         {
             this.SelectIconCommand = new DelegateCommand(SelectIcon);
             this.FontCharacters = new ObservableCollection<char>();
+            this.FontFaces = new ObservableCollection<(FontStyle, FontWeight)>();
             this.SystemFonts = Fonts.SystemFontFamilies;
         }
 
@@ -85,6 +88,16 @@ namespace T0_FontViewer.ViewModels
             }
         }
 
+        public ObservableCollection<(FontStyle, FontWeight)> FontFaces
+        {
+            get { return fontFaces; }
+            set
+            {
+                fontFaces = value;
+                OnPropertyChanged(nameof(FontFaces));
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -92,10 +105,16 @@ namespace T0_FontViewer.ViewModels
         private void OnSelectedFontChanged(FontFamily selectedFont)
         {
             this.FontCharacters.Clear();
+            this.FontFaces.Clear();
 
             var typefaces = selectedFont.GetTypefaces();
             foreach (Typeface typeface in typefaces)
             {
+                if (!this.FontFaces.Contains((typeface.Style, typeface.Weight)))
+                {
+                    this.FontFaces.Add((typeface.Style, typeface.Weight));
+                }
+
                 typeface.TryGetGlyphTypeface(out GlyphTypeface glyph);
                 if (glyph == null)
                 {
@@ -110,7 +129,7 @@ namespace T0_FontViewer.ViewModels
                 }
 
             }
-        }
+         }
 
         private void SelectIcon(object obj)
         {
