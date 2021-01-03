@@ -21,6 +21,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using T0_FontViewer.Models;
 
 namespace T0_FontViewer.ViewModels
 {
@@ -37,7 +38,10 @@ namespace T0_FontViewer.ViewModels
 
         private ObservableCollection<char> fontCharacters;
 
-        private ObservableCollection<(FontStyle, FontWeight)> fontFaces;
+        private ObservableCollection<FontFace> fontFaces;
+
+        private FontFace selectedFontFace;
+
 
         #endregion
 
@@ -47,7 +51,7 @@ namespace T0_FontViewer.ViewModels
         {
             this.SelectIconCommand = new DelegateCommand(SelectIcon);
             this.FontCharacters = new ObservableCollection<char>();
-            this.FontFaces = new ObservableCollection<(FontStyle, FontWeight)>();
+            this.FontFaces = new ObservableCollection<FontFace>();
             this.SystemFonts = Fonts.SystemFontFamilies;
         }
 
@@ -88,13 +92,23 @@ namespace T0_FontViewer.ViewModels
             }
         }
 
-        public ObservableCollection<(FontStyle, FontWeight)> FontFaces
+        public ObservableCollection<FontFace> FontFaces
         {
             get { return fontFaces; }
             set
             {
                 fontFaces = value;
                 OnPropertyChanged(nameof(FontFaces));
+            }
+        }
+
+        public FontFace SelectedFontFace
+        {
+            get { return selectedFontFace; }
+            set
+            {
+                selectedFontFace = value;
+                OnPropertyChanged(nameof(SelectedFontFace));
             }
         }
 
@@ -108,13 +122,10 @@ namespace T0_FontViewer.ViewModels
             this.FontFaces.Clear();
 
             var typefaces = selectedFont.GetTypefaces();
+
             foreach (Typeface typeface in typefaces)
             {
-                if (!this.FontFaces.Contains((typeface.Style, typeface.Weight)))
-                {
-                    this.FontFaces.Add((typeface.Style, typeface.Weight));
-                }
-
+                var glyphs = new List<char>();
                 typeface.TryGetGlyphTypeface(out GlyphTypeface glyph);
                 if (glyph == null)
                 {
@@ -126,10 +137,16 @@ namespace T0_FontViewer.ViewModels
                 foreach (KeyValuePair<int, ushort> kvp in characterMap)
                 {
                     this.FontCharacters.Add((char)kvp.Key);
+                    glyphs.Add((char)kvp.Key);
+
                 }
 
+                this.FontFaces.Add(new FontFace(selectedFont, typeface.Style, typeface.Weight, glyphs));
             }
-         }
+
+
+            this.SelectedFontFace = this.FontFaces[0];
+        }
 
         private void SelectIcon(object obj)
         {

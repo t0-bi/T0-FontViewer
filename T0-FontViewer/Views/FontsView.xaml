@@ -32,18 +32,56 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <DockPanel LastChildFill="True">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <Border
+            Grid.Row="0"
+            Grid.Column="0"
+            Background="White">
+
+            <!--  App title  -->
+            <TextBlock
+                Margin="8,0,0,0"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="12"
+                FontWeight="Bold"
+                Foreground="Black"
+                Text="{Binding SelectedFontFace.FontFamily}" />
+        </Border>
+        <ListBox
+            Grid.Row="0"
+            Grid.Column="3"
+            Margin="0,0,16,0"
+            ItemsSource="{Binding FontFaces}"
+            SelectedItem="{Binding SelectedFontFace}"
+            Style="{StaticResource HorizontalListBoxStyle}" />
 
         <!--  Font List  -->
         <ListBox
-            DockPanel.Dock="Left"
+            Grid.Row="1"
+            Grid.Column="0"
+            BorderThickness="0,1,1,0"
             ItemsSource="{Binding SystemFonts}"
             SelectedItem="{Binding SelectedFont}"
             Style="{StaticResource DefaultListBoxStyle}" />
 
         <!--  GlyphGrid  -->
-        <ScrollViewer DockPanel.Dock="Right" Style="{StaticResource DefaultScrollViewer}">
-            <ItemsControl ItemsSource="{Binding FontCharacters}">
+        <ScrollViewer
+            Grid.Row="1"
+            Grid.Column="1"
+            Grid.ColumnSpan="2"
+            Style="{StaticResource DefaultScrollViewer}">
+            <ItemsControl ItemsSource="{Binding SelectedFontFace.Glyphs}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
@@ -57,11 +95,14 @@
                             Command="{Binding DataContext.SelectIconCommand, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type DockPanel}}}"
                             CommandParameter="{Binding}"
                             Content="{Binding}"
-                            FontFamily="{Binding DataContext.SelectedFont, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type DockPanel}}}"
-                            Style="{StaticResource GlyphButtonStyle}" />
+                            FontFamily="{Binding DataContext.SelectedFontFace.FontFamily, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type DockPanel}}}"
+                            Style="{StaticResource GlyphButtonStyle}"
+                            TextElement.FontStyle="{Binding DataContext.SelectedFontFace.FontStyle, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type DockPanel}}}"
+                            TextElement.FontWeight="{Binding DataContext.SelectedFontFace.FontWeight, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type DockPanel}}}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
-    </DockPanel>
+    </Grid>
+
 </UserControl>
